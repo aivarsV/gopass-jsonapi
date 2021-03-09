@@ -166,6 +166,14 @@ func (api *API) getUsername(name string, sec gopass.Secret) string {
 			return v
 		}
 	}
+	// if no meta-data was found look in body
+	for _, line := range strings.Split(sec.Body(), "\n") {
+		for _, key := range []string{"login", "username", "user"} {
+			if strings.HasPrefix(strings.TrimSpace(line), key+": ") {
+				return strings.TrimSpace(strings.SplitN(line, ":", 2)[1])
+			}
+		}
+	}
 
 	// if no meta-data was found return the name of the secret itself
 	// as the username, e.g. providers/amazon.com/foobar -> foobar
